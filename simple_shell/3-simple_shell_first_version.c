@@ -36,10 +36,10 @@ int main(int argc __attribute__((unused)), char *argv[], char *envp[] __attribut
 		int fd;
                 pid_t my_pid;
                 char *bash_command = convert_to_bash(argv);
-                fd = open("command.sh", O_WRONLY | O_CREAT,m);
+                fd = open("command.sh", O_WRONLY | O_CREAT,0555);
                 dprintf(fd, "#!/bin/bash\n%s", bash_command);
                 close(fd);
-                execve("/command.sh", argv, NULL);
+                execve("./command.sh", argv, NULL);
 		/*
 		start:
 		my_pid = fork();
