@@ -97,9 +97,10 @@ int main(int argc , char *argv[] , char *env[] __attribute__((unused)))
 		argv[0] = "yes";
 		argv[1] = "ok";
 
-		for (i = 0 ; i < argc ; i++)
+		for (i = 0 ; *(argv) ; i++)
 		{
-			printf("%s\n", argv[i]);
+			printf("%s\n", *(argv));
+			argv++;
 		}
 		/*func(command_line, argv, argc);*/
 		return (EXIT_SUCCESS);
