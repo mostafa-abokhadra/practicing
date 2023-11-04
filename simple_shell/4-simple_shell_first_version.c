@@ -20,13 +20,18 @@ size_t _strlen(char *str)
 		return (counter);
 }
 
-void func(char *command_line, char *argv[], int argc)
+void set_argv(char *command_line, char *argv[])
 {
+		char *command_line_copy = malloc(sizeof(char) * _strlen(command_line) + 1);
 		char *token = malloc(sizeof(char));
-		int i;
-		argc = 0;
+		int i, argc = 0;
 
-		token = strtok(command_line, " ");
+                if (!command_line_copy)
+                        printf(memerr), exit(0);
+		strcpy(command_line_copy, command_line);
+		if (!token)
+			printf(memerr), exit(0);
+		token = strtok(command_line_copy, " ");
                 while (token)
                 {
                         argv[argc] = malloc(sizeof(char) * _strlen(token) + 1);
@@ -41,25 +46,49 @@ void func(char *command_line, char *argv[], int argc)
 			token = strtok(NULL, " ");
                 }
                 argv[argc] = NULL;
-                for(i = 0 ; i < argc; i++)
-                {
-                        printf("%s\n", argv[i]);
-                }
-		printf("-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-		for (i = 0; *argv[i]; i++)
-		{
-			printf("%s\n", *argv);
-			argv++;
-		}
 }
+int set_argc(char *command_line)
+{
+                char *command_line_copy = malloc(sizeof(char) * _strlen(command_line) + 1);
+		char *token;
+		int argc = 0;
 
+		if (!command_line_copy)
+			printf(memerr), exit(0);
+                strcpy(command_line_copy, command_line);
+		token = malloc(sizeof(char));
+		if (!token)
+			printf(memerr), exit(0);
+                token = strtok(command_line_copy, " ");
+                while (token)
+                {
+                        argc++;
+                        token = strtok(NULL, " ");
+                }
+		return argc;
+}
+char *set_command_line (char *command_line, int *characters_read)
+{
+		int i;
+		/* removing the newline from the command line */
+                for (i = 0; command_line[i] != '\0'; i++)
+                {
+                        if(!command_line[i + 1])
+                        {
+                                command_line[i] = '\0';
+                                break;
+                        }
+                }
+		/* subtracting the newline character */
+		(*characters_read)--;
+		return (command_line);
+}
 int main(int argc , char *argv[] , char *env[] __attribute__((unused)))
 {
 		char *command_line = malloc(sizeof(char));
-		char *token = malloc(sizeof(char));
 		size_t command_line_size = 1;
-		/* it will get resize as needed by getline */
-		int characters_read = 0, i = 0;
+		int characters_read = 0;
+		int i;
 
 		argc = 0;
 		if (!command_line)
@@ -68,40 +97,13 @@ int main(int argc , char *argv[] , char *env[] __attribute__((unused)))
 		characters_read = getline(&command_line, &command_line_size, stdin);
 		if (characters_read == -1)
 			printf("can't read from stdin\n"), exit(0);
-		/* removing the newline from the command line */
-		for (i = 0; command_line[i] != '\0'; i++)
-		{
-			if(!command_line[i + 1])
-			{
-				command_line[i] = '\0'; 
-				break;
-			}
-		}
-		characters_read--; /* subtracting the newline character */
-		token = strtok(command_line, " ");
-		while (token)
-		{
-			argc++;
-			token = strtok(NULL, " ");
-		}
+		command_line = set_command_line(command_line, &characters_read);
+		argc = set_argc(command_line);
 		if (!argc)
 			printf("argc = 0\n"), exit(0);
 		argv = malloc(sizeof(char *) * (argc + 1));
 		if (!argv)
 			dprintf(STDERR_FILENO, memerr), exit(0);
-		
-		argv[0] = malloc(sizeof(char) * 5);
-		argv[1] = malloc(sizeof(char) * 8);
-		argv[2] = '\0';
-
-		argv[0] = "yes";
-		argv[1] = "ok";
-
-		for (i = 0 ; *(argv) ; i++)
-		{
-			printf("%s\n", *(argv));
-			argv++;
-		}
-		/*func(command_line, argv, argc);*/
+		set_argv(command_line, argv);
 		return (EXIT_SUCCESS);
 }
