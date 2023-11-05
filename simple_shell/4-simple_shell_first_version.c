@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include "fork.h"
 
 #define memerr "cant't allocate memmory\n"
 
@@ -88,8 +89,8 @@ int main(int argc , char *argv[] , char *env[] __attribute__((unused)))
 		char *command_line = malloc(sizeof(char));
 		size_t command_line_size = 1;
 		int characters_read = 0;
-		int i;
 
+		start:
 		argc = 0;
 		if (!command_line)
 			printf(memerr), exit(0);
@@ -98,6 +99,8 @@ int main(int argc , char *argv[] , char *env[] __attribute__((unused)))
 		if (characters_read == -1)
 			printf("can't read from stdin\n"), exit(0);
 		command_line = set_command_line(command_line, &characters_read);
+		if (strcmp(command_line,"^c") == 0)
+			return (0);
 		argc = set_argc(command_line);
 		if (!argc)
 			printf("argc = 0\n"), exit(0);
@@ -106,5 +109,6 @@ int main(int argc , char *argv[] , char *env[] __attribute__((unused)))
 			dprintf(STDERR_FILENO, memerr), exit(0);
 		set_argv(command_line, argv);
 		processing(argv);
+		goto start;
 		return (EXIT_SUCCESS);
 }
