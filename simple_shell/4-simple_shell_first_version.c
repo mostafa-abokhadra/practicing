@@ -105,5 +105,6 @@ int main(int argc , char *argv[] , char *env[] __attribute__((unused)))
 		if (!argv)
 			dprintf(STDERR_FILENO, memerr), exit(0);
 		set_argv(command_line, argv);
+		processing(argv);
 		return (EXIT_SUCCESS);
 }
