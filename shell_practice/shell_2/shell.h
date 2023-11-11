@@ -8,59 +8,79 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/wait.h>
+#include "shell2.h"
 
-#define MEMERR  printf("%s: %s\n", temp, strerror(errno))
+extern char *environ[];
 
-char *temp;
-
-int fork_exec(char *argv[], char *env[])
+int fork_exec(char *argv[])
 {
                 pid_t pid;
                 int status;
-                int err = 0;
-
+            
                 pid = fork();
                 if(pid == 0)
-                         err = execve(argv[0], argv, env);
+		{
+                        if (execve(argv[0], argv, environ))
+			 {
+				 printf("%s: %s\n", temp, strerror(errno));;
+				 _free2d(argv);
+				 exit(127);
+			 }
+		}
                 else
-                        wait(&status);
-                return (err);
-}
-char **set_argv(int argc, char *argv[], char *command_line)
-{
-                int i;
-                char *token;
-                char *copy_command = strdup(command_line);
-
-	        if (!copy_command)
-			return (NULL);
-                argv = malloc(sizeof(char *) * argc + 1);
-                if (!argv)
-                       return (NULL);
-                token = strtok(copy_command, " \n\t");
-                for (i = 0; token; i++, token = strtok(NULL, " \n\t"))
-                {
-                        argv[i] = malloc(sizeof(char) * strlen(token) + 1);
-                        if (!argv[i])
-                                return(NULL);
-                        strcpy(argv[i], token);
-                }
-                argv[i] = NULL;
-                return (argv);
+		{
+                        waitpid(pid, &status, 0);
+			_free2d(argv);
+		}
+                return (WEXITSTATUS(status));
 }
 int set_argc(int *argc, char *command_line)
 {
                 char *copy_command = strdup(command_line);
-                char *token;
-		
-		if (!copy_command)
-			return (0);
+                char *token = NULL;
+
                 *argc = 0;
                 token = strtok(copy_command, " \n\t");
+                if (!token)
+                {
+                        free(command_line);
+                        free(copy_command);
+                        return (0);
+                }
                 for (; token ; (*argc)++, token = strtok(NULL, " \n\t"))
                 {}
+                free(copy_command);
                 return (1);
 }
+char **set_argv(int *argc, char *argv[], char *command_line)
+{
+                int i;
+                char *token = NULL;
+                char *copy_command = NULL;
 
+		if (!command_line)
+			return (NULL);
+		copy_command = strdup(command_line);
+		token = strtok(copy_command, " \n\t");
+		if (!token)
+                {
+                        free(command_line);
+                        free(copy_command);
+                        return (NULL);
+                }
+		if(!set_argc(argc, command_line))
+			return (NULL);
+                argv = malloc(sizeof(char *) * (*argc) + 1);
+                if (!argv)
+		{
+		       free(command_line);
+                       return (NULL);
+		}
+                for (i = 0; token; i++, token = strtok(NULL, " \n\t"))
+                        argv[i] = strdup(token);
+                argv[i] = NULL;
+		free(command_line);
+                return (argv);
+}
 #endif /* __SHELL__ */
 
