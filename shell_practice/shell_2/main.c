@@ -1,24 +1,23 @@
-#include "shell.h"
-#include "shell2.h"
+#include "shell_1.h"
 
 int main(int argc __attribute__((unused)), char *argv[])
 {
+		int out = 0;
 		char *command_line = NULL;
-
+		char **tokenized = NULL;
+	
 		while(1)
 		{
 			command_line = read_command();
 			if (!command_line)
 			{
-		               if (isatty(STDIN_FILENO))
-                	     		printf("\n");
-			       free(command_line);
-			       return (0);
+				if (isatty(STDIN_FILENO))
+					printf("\n");
+				return (out);
 			}
-			if (!(argv = set_argv(&argc, argv, command_line)))
-				 printf("%s: %s\n", temp, strerror(errno));
-			fork_exec(argv);
+			if(!(tokenized = set_command(command_line)))
+				continue;
+			out = fork_exec(tokenized, argv);
 		}
-		free(temp);
 		return (0);
 }
