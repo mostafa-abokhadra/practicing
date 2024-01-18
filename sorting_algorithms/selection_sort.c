@@ -2,26 +2,32 @@
 
 int main()
 {
-		int arr[] = {5, 6, 7, 3, 4, 9, 10, 2, 17, 1}, t;
-		long unsigned int i, j;
+		int arr[] = {10, 2, 3, 4, 9, 8, 5, 6, 4,33}, t, num;
+		long unsigned int i, j, lowest_ind = 0;
+
+		for (i = 0; i < sizeof(arr) / sizeof(arr[0]) ; i++)
+			printf("%d ", arr[i]);
+		printf("\n");
 
 		for (i = 0; i < sizeof(arr) / sizeof(arr[0]) ; i++)
 		{
-			for (j = 0; j < sizeof(arr) / sizeof(arr[0]) ; j++)
-			{
-				if (arr[j] > arr[i])
+			num = arr[i];
+			for (j = i ; j < sizeof(arr) / sizeof(arr[0]) ; j++)
+				if (arr[j] < num)
 				{
-					t = arr[i];
-					arr[i] = arr[j];
-					arr[j] = t;
+					num = arr[j];
+					lowest_ind = j;
 				}
+			if (num != arr[i])
+			{
+				t = arr[i];
+				arr[i] = arr[lowest_ind];
+				arr[lowest_ind] = t;
 			}
 		}
 
 		for (i = 0 ; i < sizeof(arr) / sizeof(arr[0]); i++)
-		{
 			printf("%d ", arr[i]);
-		}
 		printf("\n");
 		return (0);
 }
