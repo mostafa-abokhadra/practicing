@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 
-class rec:
-    pass
-
-ins = rec()
-name = ins.__class__.__name__
-name += ".json"
-print(name)
+file = open("messi.txt", mode="a", encoding="utf-8")
+for i in range(10):
+    file.write(str(i))
+file.close()
