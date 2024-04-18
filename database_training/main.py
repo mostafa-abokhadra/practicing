@@ -9,14 +9,10 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 with engine.connect() as connection:
-    user1 = user(
-            id = 1,
-            name = "mostafa",
-            email='yes@gmail.com',
-            passwd = 'mostafaf'
-            )
-    com = comment()
-    com.comment = "this is my first comment2"
-    com.user_id = 4
-    session.add(com)
+    com1 = comment(comment = "yes sir", user_id = 1)
+    com2 = comment(comment = "ok sir", user_id = 3)
+    com3 = comment(comment = "no sir", user_id = 2)
+    session.add(com1)
+    session.add(com2)
+    session.add(com3)
     session.commit()

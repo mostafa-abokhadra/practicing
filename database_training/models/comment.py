@@ -6,7 +6,6 @@ from models.user import user
 
 class comment(base):
     __tablename__ = 'comments'
-    user_name = Column(String(50), ForeignKey('users.name'), nullable=False)
     comment_id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     comment = Column(String(100))
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
